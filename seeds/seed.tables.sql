@@ -1,4 +1,5 @@
 --psql -U postgres -d spaced_repetition -f ./seeds/seed.tables.sql
+--heroku pg:psql -f ./seeds/seed.tables.sql
 
 BEGIN;
 
