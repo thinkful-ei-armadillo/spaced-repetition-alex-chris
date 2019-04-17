@@ -1,3 +1,7 @@
+'use strict'; 
+
+const LinkedList = require('./Linked-List')
+
 const LanguageService = {
   getUsersLanguage(db, user_id) {
     return db
@@ -7,10 +11,10 @@ const LanguageService = {
         'language.name',
         'language.user_id',
         'language.head',
-        'language.total_score',
+        'language.total_score'
       )
       .where('language.user_id', user_id)
-      .first()
+      .first();
   },
 
   getLanguageWords(db, language_id) {
@@ -24,9 +28,9 @@ const LanguageService = {
         'next',
         'memory_value',
         'correct_count',
-        'incorrect_count',
+        'incorrect_count'
       )
-      .where({ language_id })
+      .where({ language_id });
   },
 
   getNextWord(db, language_id){
@@ -40,8 +44,22 @@ const LanguageService = {
       )
       .leftJoin('language as l', 'w.language_id', 'l.id')
       .where({ language_id })
-      .first()
-  }
-}
+      .first();
+  },
 
-module.exports = LanguageService
+  createLinkedList(db, language_head){
+    return db
+      .from('word')
+      .select('*')
+      .where('id', language_head)
+      .then(words => {
+        const list = new LinkedList();
+        words.forEach(word => {
+          list.insertLast(word); 
+        });
+        return list; 
+      });
+  }
+};
+
+module.exports = LanguageService;

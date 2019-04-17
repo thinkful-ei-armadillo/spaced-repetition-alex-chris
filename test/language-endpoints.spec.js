@@ -43,7 +43,7 @@ describe.only('Language Endpoints', function () {
             db,
             testUsers,
             testLanguages,
-            testWords,
+            testWords
           )
         })
 
@@ -75,7 +75,7 @@ describe.only('Language Endpoints', function () {
         db,
         testUsers,
         testLanguages,
-        testWords,
+        testWords
       )
     })
 
@@ -119,7 +119,7 @@ describe.only('Language Endpoints', function () {
         db,
         testUsers,
         testLanguages,
-        testWords,
+        testWords
       )
     })
 
@@ -151,11 +151,11 @@ describe.only('Language Endpoints', function () {
         db,
         testUsers,
         testLanguages,
-        testWords,
+        testWords
       )
     })
 
-    it.skip(`responds with 400 required error when 'guess' is missing`, () => {
+    it(`responds with 400 required error when 'guess' is missing`, () => {
       const postBody = {
         randomField: 'test random field',
       }
