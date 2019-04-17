@@ -1,6 +1,6 @@
 'use strict'; 
 
-const LinkedList = require('./Linked-List')
+const { LinkedList } = require('./Linked-List')
 
 const LanguageService = {
   getUsersLanguage(db, user_id) {
@@ -32,8 +32,7 @@ const LanguageService = {
       )
       .where({ language_id });
   },
-
-  getNextWord(db, language_id){
+  getNextWord(db, language_id, head_id){
     return db 
       .from('word as w')
       .select(
@@ -44,21 +43,50 @@ const LanguageService = {
       )
       .leftJoin('language as l', 'w.language_id', 'l.id')
       .where({ language_id })
+      .andWhere('w.id', head_id)
       .first();
   },
-
-  createLinkedList(db, language_head){
+  getWord(db, word_id) {
     return db
       .from('word')
       .select('*')
-      .where('id', language_head)
-      .then(words => {
-        const list = new LinkedList();
-        words.forEach(word => {
-          list.insertLast(word); 
-        });
-        return list; 
-      });
+      .where('id', word_id)
+      .first();
+  },
+  persistUpdatedList(db, list, language) {
+    let promises = [];
+    let node = list.head;
+    //update all words
+    while (node !== null) {
+      promises.push(
+        db('word')
+          .update({
+            ...node.value
+          })
+          .where('id', node.value.id)
+      );
+      node = node.next;
+    }
+    //update language
+    promises.push(
+      db('language')
+        .update(language)
+        .where('id', language.id)
+    );
+    return Promise.all(promises);
+  },
+  createLanguageLL: async function(db, head_id){
+    const list = new LinkedList();
+    let nextId = head_id;
+    while (nextId !== null) {
+      const node = await LanguageService.getWord(
+        db,
+        nextId
+      );
+      nextId = node.next;
+      list.insertLast(node);
+    }
+    return list;
   }
 };
 

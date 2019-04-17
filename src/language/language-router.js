@@ -3,7 +3,7 @@ const LanguageService = require('./language-service')
 const { requireAuth } = require('../middleware/jwt-auth')
 const bodyParser = express.json()
 const languageRouter = express.Router()
-const LinkedList = require('./Linked-List')
+const { listInsertAt } = require('./Linked-List')
 
 languageRouter
   .use(requireAuth)
@@ -47,7 +47,11 @@ languageRouter
 languageRouter
   .get('/head', async (req, res, next) => {
     try{
-      const word = await LanguageService.getNextWord(req.app.get('db'), req.language.id);
+      const word = await LanguageService.getNextWord(
+        req.app.get('db'), 
+        req.language.id,
+        req.language.head
+      );
       res.json({
         nextWord: word.original,
         totalScore: word.total_score,
@@ -61,22 +65,57 @@ languageRouter
   })
 
 languageRouter
-  .post('/guess', bodyParser, async (req, res, next) => {
-    if (!req.body.answer){
-      return res.status(400).json({error: "Missing 'guess' in request body"}); 
+.post('/guess', bodyParser, async (req, res, next) => {
+  if (!req.body.guess){
+    return res.status(400).json({error: "Missing 'guess' in request body"}); 
+  }
+  try{
+    const list = await LanguageService.createLanguageLL(
+      req.app.get('db'),
+      req.language.head
+    );
+    const head = list.head;
+    /*if guess is correct:
+        update memory value -> * 2
+        increase score
+        move to memory_value pos
+    */
+    if (req.body.guess === head.value.translation) {
+      head.value.memory_value = head.value.memory_value * 2;
+      head.value.correct_count++;
+      req.language.total_score++;
+      req.language.head = head.next.value.id;
+      list.head = head.next;
+      listInsertAt(list, head.value, head.value.memory_value);
+    /*if guess is wrong:
+      reset memory value
+      move to next pos to try again
+    */
+    } else {
+      head.value.memory_value = 1;
+      head.value.incorrect_count++;
+      req.language.head = head.next.value.id;
+      list.head = head.next;
+      listInsertAt(list, head.value, head.value.memory_value);
     }
-    try{
-      const list = await LanguageService.createLinkedList(req.app.get('db'), req.language.head);
-      if (req.body.answer = list.head.value.translation) {
-          head.value.correct_count = head.value.correct_count + 1;
-          head.value.memory_value = head.value.memory_value * 2; 
-
-      } 
-      res.json(list); 
-      next()
-    } catch(error){
-      next(error); 
-    } 
-  })
+    await LanguageService.persistUpdatedList(
+      req.app.get('db'),
+      list,
+      req.language
+    );
+    //send back our updated data
+    res.json({
+      nextWord: list.head.value.original,
+      totalScore: req.language.total_score,
+      wordCorrectCount: list.head.value.correct_count,
+      wordIncorrectCount: list.head.value.incorrect_count,
+      answer: head.value.translation,
+      isCorrect: req.body.guess === head.value.translation
+    });
+    next();
+  } catch(error){
+    next(error); 
+  } 
+});
 
 module.exports = languageRouter
