@@ -44,7 +44,6 @@ class LinkedList {
       tempNode = tempNode.next;
     }
     if (tempNode === null) {
-      console.log('Item not found');
       return;
     }
     previousNode.next = new _Node(item, tempNode);
@@ -61,7 +60,6 @@ class LinkedList {
       tempNode = tempNode.next;
     }
     if (tempNode === null) {
-      console.log('Item not found');
       return;
     }
     const tempNext = tempNode.next;
@@ -69,7 +67,6 @@ class LinkedList {
   }
 
   insertAt(item, index) {
-    // console.log(index, item);
     if (!this.head) {
       return null;
     }
@@ -84,7 +81,6 @@ class LinkedList {
       tempIndex++;
     }
     if (tempNode === null && tempIndex !== index) {
-      console.log('Index not available');
       return;
     }
     previousNode.next = new _Node(item, tempNode);
@@ -108,7 +104,6 @@ class LinkedList {
       tempNode = tempNode.next;
     }
     if (tempNode === null) {
-      console.log(`Can't remove, ${item} not found`);
       return;
     }
     previousNode.next = tempNode.next;
@@ -132,7 +127,6 @@ class LinkedList {
 }
 
 function listInsertAt(list, value, index) {
-  // console.log(index, item);
   if (!list.head) {
     return null;
   }

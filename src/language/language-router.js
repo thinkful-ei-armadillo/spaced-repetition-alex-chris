@@ -80,7 +80,8 @@ languageRouter
         increase score
         move to memory_value pos
     */
-    if (req.body.guess === head.value.translation) {
+   const isCorrect = req.body.guess.toLowerCase() === head.value.translation;
+    if (isCorrect) {
       head.value.memory_value = head.value.memory_value * 2;
       head.value.correct_count++;
       req.language.total_score++;
@@ -110,7 +111,7 @@ languageRouter
       wordCorrectCount: list.head.value.correct_count,
       wordIncorrectCount: list.head.value.incorrect_count,
       answer: head.value.translation,
-      isCorrect: req.body.guess === head.value.translation
+      isCorrect: isCorrect
     });
     next();
   } catch(error){
