@@ -14,24 +14,24 @@ Project was completed to provided test specifications and built off of a provide
 
 ### Authorization/User Endpoints (provided)
 
-#### post /api/auth/token
+###### `post /api/auth/token`
 Verifies credentials for logins
 
-#### put /api/auth
+###### `put /api/auth`
 Allows automatic refreshing of token
 
-#### post /api/user
+###### `post /api/user`
 Handles registration/sign-up
 
 ### Language Endpoints
 
-#### get /api/language
+###### `get /api/language`
 Retrieves current language for user
 
-#### get /api/language/head
+###### `get /api/language/head`
 Retrieves the first word for the user to learn for the specified language
 
-#### post /api/language/guess
+###### `post /api/language/guess`
 Handles user translation submissions
 Confirms guess was included in request body
 Creates a linked list data structure and automatically populates said list  form the database
